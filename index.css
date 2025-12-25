@@ -1101,6 +1101,29 @@ fieldset {
   font-weight: bold;
 }
 
+#battleBody .battleArmyVisual {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  padding: 0.2em 0.6em;
+}
+
+#battleBody .battleArmyVisual .battleUnit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  padding: 0 0.45em;
+  border-radius: 0.45em;
+  background-color: #ffffffa6;
+  border: 1px solid #d4d4d4;
+  font-size: 1em;
+}
+
+#battleBody .battleArmyVisual .battleArrow {
+  opacity: 0.55;
+}
+
 tr.battleCasualties,
 tr.battleSurvivors {
   font-style: italic;

@@ -23,6 +23,7 @@ class Battle {
     this.calculateStrength("attackers");
     this.calculateStrength("defenders");
     this.getInitialMorale();
+    this.updateBattleVisuals();
 
     $("#battleScreen").dialog({
       title: this.name,
@@ -140,6 +141,37 @@ class Battle {
     battleAttackers.innerHTML = battleDefenders.innerHTML = headers;
   }
 
+  getTypeTotals(regiments) {
+    const forces = this.getJoinedForces(regiments);
+    return options.military.reduce((totals, unit) => {
+      if (!totals[unit.type]) totals[unit.type] = 0;
+      totals[unit.type] += forces[unit.name] || 0;
+      return totals;
+    }, {});
+  }
+
+  updateBattleVisuals() {
+    const visuals = [
+      {type: "ranged", icon: "🏹", label: "Archers (ranged)"},
+      {type: "mounted", icon: "🐎", label: "Cavalry (mounted)"},
+      {type: "melee", icon: "🛡️", label: "Infantry (melee)"}
+    ];
+
+    ["attackers", "defenders"].forEach(side => {
+      const el = byId("battleArmy_" + side);
+      if (!el) return;
+      const totals = this.getTypeTotals(this[side].regiments);
+      el.innerHTML = visuals
+        .map((visual, index) => {
+          const count = totals[visual.type] || 0;
+          const unit = `<span class="battleUnit" data-tip="${visual.label}">${visual.icon} <strong>${count}</strong></span>`;
+          const arrow = index < visuals.length - 1 ? `<span class="battleArrow">→</span>` : "";
+          return unit + arrow;
+        })
+        .join("");
+    });
+  }
+
   addRegiment(side, regiment) {
     regiment.casualties = Object.keys(regiment.u).reduce((a, b) => ((a[b] = 0), a), {});
     regiment.survivors = Object.assign({}, regiment.u);
@@ -185,6 +217,7 @@ class Battle {
     div.innerHTML += body + initial + casualties + survivors + "</tbody>";
     this[side].regiments.push(regiment);
     this[side].distances.push(distance);
+    this.updateBattleVisuals();
   }
 
   addSide() {
@@ -727,6 +760,7 @@ class Battle {
     // update table values
     this.updateTable("attackers");
     this.updateTable("defenders");
+    this.updateBattleVisuals();
 
     // prepare for next iteration
     this.iteration += 1;
